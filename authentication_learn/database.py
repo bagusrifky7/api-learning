@@ -7,19 +7,20 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from psycopg2.extras import RealDictCursor
+import database
 
 # load emv
 load_dotenv()
 
-# db information
-USER = os.getenv("USER")
-PASSWORD = os.getenv("PASSWORD")
-HOST = os.getenv("HOST")
-PORT = os.getenv("PORT")
-DBNAME = os.getenv("DBNAME")
+# # db information
+# USER = os.getenv("USER")
+# PASSWORD = os.getenv("PASSWORD")
+# HOST = os.getenv("HOST")
+# PORT = os.getenv("PORT")
+# DBNAME = os.getenv("DBNAME")
 
 # supabase url
-supabase_url = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+supabase_url = os.getenv("DATABASE_URL")
 
 # create engine
 engine = create_engine(supabase_url)

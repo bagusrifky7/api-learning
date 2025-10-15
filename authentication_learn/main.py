@@ -1,8 +1,17 @@
-from fastapi import FastAPI, Response, status, HTTPException
+import uvicorn
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from typing_extensions import Optional
 from random import randrange
+from sqlalchemy.orm import Session
+from database import engine, get_db
+import models
+
+# updating database
+print("Syncing database schema with Supabase...")
+models.Base.metadata.create_all(bind=engine) # importing Base that inherit by many table from models
+print("Database is up to date")
 
 class Post(BaseModel):
     title: str
@@ -16,6 +25,7 @@ my_post = [
     {"title": "title of post two", "content": "content of post 2", "id": "2"}
     ]
 
+
 # function for finding posts
 def find_post(id):
     for p in my_post:
@@ -28,6 +38,7 @@ def get_post_index(id):
         if p['id'] == id:
             return i
 
+# create api endpoint
 app = FastAPI()
 
 @app.get("/")
@@ -35,6 +46,11 @@ def root():
     return {
         "Status": "OK"
     }
+
+# for create and updating model
+@app.get("/create_db")
+def db_stuff(db: Session = Depends(get_db)):
+    posts = db.query()
 
 @app.get("/posts")
 def get_posts():
@@ -92,3 +108,7 @@ def update_post(id, post: Post):
     my_post[index] = post_dict
 
     return {"data": post_dict}
+
+# running the api
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=9500, reload=True)
